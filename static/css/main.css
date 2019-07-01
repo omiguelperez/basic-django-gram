@@ -11,10 +11,13 @@ html, body {
     border-radius: 1px;
 }
 
+#login-form input {
+    border-radius: 0 !important;
+}
+
 #main-navbar {
     background: #fff;
     border-bottom: 1px solid rgba(0,0,0,.0975);
-    margin-bottom: 72px;
 }
 
 .post-container {

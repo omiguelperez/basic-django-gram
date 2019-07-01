@@ -1,7 +1,10 @@
 """Posts views."""
 
 from datetime import datetime
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views import View
 
 posts = [
     {
@@ -34,6 +37,13 @@ posts = [
 ]
 
 
-def list_posts(request):
-    """List existing posts."""
-    return render(request, 'posts/feed.html', {'posts': posts})
+class PostListView(LoginRequiredMixin,
+                   View):
+    """Posts view."""
+
+    login_url = reverse_lazy('login')
+    redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        """Handle GET request. List posts if is authenticated."""
+        return render(request, 'posts/feed.html', {'posts': posts})

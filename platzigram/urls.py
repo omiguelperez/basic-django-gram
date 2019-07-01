@@ -9,11 +9,12 @@ from platzigram import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hello-world/', views.hello_world, name='hello-world'),
-    path('sort-numbers/', views.sort_numbers, name='sort-numbers'),
+    path('hello-world/', views.hello_world, name='hello_world'),
+    path('sort-numbers/', views.sort_numbers, name='sort'),
     path('hi/<name>/<int:age>/', views.say_hi, name='hi'),
 
     path('posts/', include('posts.urls')),
+    path('users/', include('users.urls')),
 ]
 
 if settings.DEBUG:
