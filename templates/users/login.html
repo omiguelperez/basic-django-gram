@@ -7,7 +7,7 @@
 {% block container %}
 
 {% if error %}
-<p class="text-center" style="color: red;">{{ error }}</p>
+<p class="text-center alert alert-danger" style="color: red;">{{ error }}</p>
 {% endif%}
 
 <form method="POST" class="form" id="login-form" action="{% url "login" %}">
