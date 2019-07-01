@@ -107,3 +107,4 @@ venv.bak/
 .vscode/
 db.sqlite3
 users/pictures/
+media/
