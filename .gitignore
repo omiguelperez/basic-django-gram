@@ -106,3 +106,4 @@ venv.bak/
 # Project
 .vscode/
 db.sqlite3
+users/pictures/
