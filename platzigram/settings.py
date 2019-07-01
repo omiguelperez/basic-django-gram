@@ -48,7 +48,9 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-MIDDLEWARE = [
+# Middlewares
+
+DJANGO_MIDDLEWARES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,6 +59,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+THIRH_PARTY_MIDDLEWARES = []
+
+LOCAL_MIDDLEWARES = [
+    'platzigram.middleware.ProfileCompletionMiddleware',
+]
+
+MIDDLEWARE = DJANGO_MIDDLEWARES + THIRH_PARTY_MIDDLEWARES + LOCAL_MIDDLEWARES
 
 ROOT_URLCONF = 'platzigram.urls'
 

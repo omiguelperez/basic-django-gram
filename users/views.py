@@ -72,3 +72,11 @@ def logout_view(request):
     """Logout user."""
     logout(request)
     return redirect('login')
+
+
+class UpdateProfileView(View):
+    """Update profile view."""
+
+    def get(self, request, *args, **kwargs):
+        """Handle GET request. Send update profile template."""
+        return render(request, 'users/update_profile.html')
