@@ -11,7 +11,8 @@ html, body {
     border-radius: 1px;
 }
 
-#login-form input {
+#login-form input,
+#signup-form input {
     border-radius: 0 !important;
 }
 
