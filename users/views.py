@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
 from django.views import View
 
+from users.forms import ProfileForm
 from users.models import Profile
 
 
@@ -77,6 +78,34 @@ def logout_view(request):
 class UpdateProfileView(View):
     """Update profile view."""
 
+    def get_context(self, request, form):
+        """Get form context."""
+        context = {
+            'user': request.user,
+            'profile': request.user.profile,
+            'form': form
+        }
+        return context
+
     def get(self, request, *args, **kwargs):
         """Handle GET request. Send update profile template."""
-        return render(request, 'users/update_profile.html')
+        form = ProfileForm()
+        context = self.get_context(request, form)
+        return render(request, 'users/update_profile.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        """Handle POST request. Update user profile."""
+        form = ProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            profile = request.user.profile
+
+            profile.website = data['website']
+            profile.phone_number = data['phone_number']
+            profile.biography = data['biography']
+            profile.picture = data['picture']
+            profile.save()
+
+            return redirect('update_profile')
+        context = self.get_context(request, form)
+        return render(request, 'users/update_profile.html', context=context)
