@@ -1,2 +1,2 @@
-# basic-django-platzigram
-Basic Django course Platzigram project
+# basic-django-gram
+Basic Django course project
