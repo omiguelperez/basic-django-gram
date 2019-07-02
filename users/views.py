@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
 from django.views import View
 
-from users.forms import ProfileForm
+from users.forms import ProfileForm, SignupForm
 from users.models import Profile
 
 
@@ -37,34 +37,18 @@ class SignupView(View):
 
     def get(self, request, *args, **kwargs):
         """Handle GET request. Send signup template."""
-        return render(request, 'users/signup.html')
+        form = SignupForm()
+        return render(request, 'users/signup.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         """Handle POST request. Create user."""
-        username = request.POST['username']
-        passwd = request.POST['passwd']
-        passwd_confirmation = request.POST['passwd_confirmation']
+        form = SignupForm(request.POST)
+        
+        if form.is_valid():
+            form.save()
+            return redirect('login')
 
-        if passwd != passwd_confirmation:
-            return render(
-                request, 'users/signup.html',
-                {'error': 'Password confirmation does not match'})
-
-        try:
-            user = User.objects.create_user(username=username, password=passwd)
-        except IntegrityError:
-            return render(request, 'users/signup.html',
-                          {'error': 'Username is already in use'})
-
-        user.first_name = request.POST['first_name']
-        user.last_name = request.POST['last_name']
-        user.email = request.POST['email']
-        user.save()
-
-        profile = Profile(user=user)
-        profile.save()
-
-        return redirect('login')
+        return render(request, 'users/signup.html', {'form': form})
 
 
 @login_required(login_url=reverse_lazy('login'),

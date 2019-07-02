@@ -16,6 +16,19 @@ html, body {
     border-radius: 0 !important;
 }
 
+#signup-form input {
+    padding: .2em .5em;
+    width: 100%;
+}
+
+#signup-form label {
+    margin-bottom: 0;
+}
+
+#signup-form p {
+    margin-bottom: .4em;
+}
+
 #main-navbar {
     background: #fff;
     border-bottom: 1px solid rgba(0,0,0,.0975);
