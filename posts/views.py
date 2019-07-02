@@ -2,39 +2,12 @@
 
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 
-posts = [
-    {
-        'title': 'Mont Blanc',
-        'user': {
-            'name': 'Yésica Cortés',
-            'picture': 'https://picsum.photos/60/60/?image=1027'
-        },
-        'timestamp': datetime.now().strftime('%b %dth, %Y - %H:%M hrs'),
-        'photo': 'https://picsum.photos/800/600?image=1036',
-    },
-    {
-        'title': 'Via Láctea',
-        'user': {
-            'name': 'Christian Van der Henst',
-            'picture': 'https://picsum.photos/60/60/?image=1005'
-        },
-        'timestamp': datetime.now().strftime('%b %dth, %Y - %H:%M hrs'),
-        'photo': 'https://picsum.photos/800/800/?image=903',
-    },
-    {
-        'title': 'Nuevo auditorio',
-        'user': {
-            'name': 'Uriel (thespianartist)',
-            'picture': 'https://picsum.photos/60/60/?image=883'
-        },
-        'timestamp': datetime.now().strftime('%b %dth, %Y - %H:%M hrs'),
-        'photo': 'https://picsum.photos/500/700/?image=1076',
-    }
-]
+from posts.forms import PostForm
+from posts.models import Post
 
 
 class PostListView(LoginRequiredMixin,
@@ -46,4 +19,37 @@ class PostListView(LoginRequiredMixin,
 
     def get(self, request, *args, **kwargs):
         """Handle GET request. List posts if is authenticated."""
+        posts = Post.objects.all().order_by('-created')
         return render(request, 'posts/feed.html', {'posts': posts})
+
+
+class CreatePostView(LoginRequiredMixin,
+                     View):
+    """Create post view."""
+
+    login_url = reverse_lazy('login')
+    redirect_field_name = 'redirect_to'
+
+    def get_context(self, request, form):
+        """Get request context."""
+        context = {
+            'user': request.user,
+            'profile': request.user.profile,
+            'form': form
+        }
+        return context
+
+    def get(self, request, *args, **kwargs):
+        """Handle GET request. Send create post form."""
+        form = PostForm()
+        context = self.get_context(request, form)
+        return render(request, 'posts/create.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        """Handle POST request. Create new post."""
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('posts')
+        context = self.get_context(request, form)
+        return render(request, 'posts/create.html', context=context)
