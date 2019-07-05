@@ -26,7 +26,7 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect('posts')
+            return redirect('posts:feed')
         else:
             return render(request, 'users/login.html',
                           {'error': 'Invalid username and password'})
@@ -46,7 +46,7 @@ class SignupView(View):
         
         if form.is_valid():
             form.save()
-            return redirect('login')
+            return redirect('users:login')
 
         return render(request, 'users/signup.html', {'form': form})
 
@@ -56,7 +56,7 @@ class SignupView(View):
 def logout_view(request):
     """Logout user."""
     logout(request)
-    return redirect('login')
+    return redirect('users:login')
 
 
 class UpdateProfileView(View):
@@ -90,6 +90,6 @@ class UpdateProfileView(View):
             profile.picture = data['picture']
             profile.save()
 
-            return redirect('update_profile')
+            return redirect('users:update_profile')
         context = self.get_context(request, form)
         return render(request, 'users/update_profile.html', context=context)

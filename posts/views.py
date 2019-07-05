@@ -14,7 +14,7 @@ class PostListView(LoginRequiredMixin,
                    View):
     """Posts view."""
 
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy('users:login')
     redirect_field_name = 'redirect_to'
 
     def get(self, request, *args, **kwargs):
@@ -50,6 +50,6 @@ class CreatePostView(LoginRequiredMixin,
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('posts')
+            return redirect('posts:feed')
         context = self.get_context(request, form)
         return render(request, 'posts/create.html', context=context)
