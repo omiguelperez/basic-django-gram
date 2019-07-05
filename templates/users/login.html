@@ -6,8 +6,10 @@
 
 {% block container %}
 
-{% if error %}
-<p class="text-center alert alert-danger" style="color: red;">{{ error }}</p>
+{% if form.errors %}
+    <p class="text-center alert alert-danger">
+        Invalid credentials. Please, try again.
+    </p>
 {% endif%}
 
 <form method="POST" class="form" id="login-form" action="{% url "users:login" %}">
