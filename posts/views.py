@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView, CreateView
 
 from posts.forms import PostForm
 from posts.models import Post
@@ -18,35 +18,27 @@ class PostListView(LoginRequiredMixin, ListView):
     queryset = Post.objects.all().order_by('-created')
     context_object_name = 'posts'
     paginated_by = 30
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    """Post detail view."""
+
+    template_name = 'posts/detail.html'
+    queryset = Post.objects.all()
+    context_object_name = 'post'
     
 
-class CreatePostView(LoginRequiredMixin,
-                     View):
-    """Create post view."""
+class CreatePostView(LoginRequiredMixin, CreateView):
+    """Post create view."""
 
-    login_url = reverse_lazy('login')
-    redirect_field_name = 'redirect_to'
+    template_name = 'posts/create.html'
+    form_class = PostForm
+    success_url = reverse_lazy('posts:feed')
 
-    def get_context(self, request, form):
-        """Get request context."""
-        context = {
-            'user': request.user,
-            'profile': request.user.profile,
-            'form': form
-        }
+    def get_context_data(self, **kwargs):
+        """Add user and profile to context."""
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        context['profile'] = self.request.user.profile
         return context
 
-    def get(self, request, *args, **kwargs):
-        """Handle GET request. Send create post form."""
-        form = PostForm()
-        context = self.get_context(request, form)
-        return render(request, 'posts/create.html', context=context)
-
-    def post(self, request, *args, **kwargs):
-        """Handle POST request. Create new post."""
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('posts:feed')
-        context = self.get_context(request, form)
-        return render(request, 'posts/create.html', context=context)

@@ -4,11 +4,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
+from django.shortcuts import render, redirect, reverse
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView, UpdateView
 
 from posts.models import Post
 from users.forms import ProfileForm, SignupForm
@@ -52,23 +52,17 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class SignupView(View):
+class SignupView(FormView):
     """Signup view."""
 
-    def get(self, request, *args, **kwargs):
-        """Handle GET request. Send signup template."""
-        form = SignupForm()
-        return render(request, 'users/signup.html', {'form': form})
+    template_name = 'users/signup.html'
+    form_class = SignupForm
+    success_url = reverse_lazy('users:login')
 
-    def post(self, request, *args, **kwargs):
-        """Handle POST request. Create user."""
-        form = SignupForm(request.POST)
-        
-        if form.is_valid():
-            form.save()
-            return redirect('users:login')
-
-        return render(request, 'users/signup.html', {'form': form})
+    def form_valid(self, form):
+        """Save form data."""
+        form.save()
+        return super().form_valid(form)
 
 
 @login_required(login_url=reverse_lazy('login'),
@@ -79,37 +73,18 @@ def logout_view(request):
     return redirect('users:login')
 
 
-class UpdateProfileView(View):
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
     """Update profile view."""
 
-    def get_context(self, request, form):
-        """Get form context."""
-        context = {
-            'user': request.user,
-            'profile': request.user.profile,
-            'form': form
-        }
-        return context
+    template_name = 'users/update_profile.html'
+    fields = ('picture', 'website', 'biography', 'phone_number')
+    model = Profile
+    
+    def get_object(self):
+        """Return user's profile."""
+        return self.request.user.profile
 
-    def get(self, request, *args, **kwargs):
-        """Handle GET request. Send update profile template."""
-        form = ProfileForm()
-        context = self.get_context(request, form)
-        return render(request, 'users/update_profile.html', context=context)
+    def get_success_url(self):
+        """Return to user's profile."""
+        return reverse('users:profile', kwargs={'username': self.request.user.username})
 
-    def post(self, request, *args, **kwargs):
-        """Handle POST request. Update user profile."""
-        form = ProfileForm(request.POST, request.FILES)
-        if form.is_valid():
-            data = form.cleaned_data
-            profile = request.user.profile
-
-            profile.website = data['website']
-            profile.phone_number = data['phone_number']
-            profile.biography = data['biography']
-            profile.picture = data['picture']
-            profile.save()
-
-            return redirect('users:update_profile')
-        context = self.get_context(request, form)
-        return render(request, 'users/update_profile.html', context=context)
