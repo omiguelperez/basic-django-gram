@@ -5,23 +5,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import ListView
 
 from posts.forms import PostForm
 from posts.models import Post
 
 
-class PostListView(LoginRequiredMixin,
-                   View):
-    """Posts view."""
+class PostListView(LoginRequiredMixin, ListView):
+    """Posts feed view."""
 
-    login_url = reverse_lazy('users:login')
-    redirect_field_name = 'redirect_to'
-
-    def get(self, request, *args, **kwargs):
-        """Handle GET request. List posts if is authenticated."""
-        posts = Post.objects.all().order_by('-created')
-        return render(request, 'posts/feed.html', {'posts': posts})
-
+    template_name = 'posts/feed.html'
+    queryset = Post.objects.all().order_by('-created')
+    context_object_name = 'posts'
+    paginated_by = 30
+    
 
 class CreatePostView(LoginRequiredMixin,
                      View):
